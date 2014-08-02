@@ -6,4 +6,4 @@ below will start the server:
  
     require('aserver')(8000);
 
-'html' and 'service' will be created and contain static file and controllers respectively
+'html' and 'service' will be created and contain static file(s) and controller(s) respectively
