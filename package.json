@@ -1,0 +1,14 @@
+{  
+	"name": "AServer",
+	"description": "a server",   
+	"author": "Shen Z <shenAwesome@gmail.com>",
+	"version": "0.0.1",
+	"main": "index.js",  
+
+	"dependencies": {
+		"express": "*",
+		"mongoose":"*",
+		"body-parser":"*",
+		"memory-cache":"*"
+	}
+}
