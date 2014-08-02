@@ -1,17 +1,6 @@
 var express = require('express');
 var fs = require('fs');
-var bodyParser = require('body-parser'); 
-
-var app = express();  
-
-app.get('/', function(req, res){
-  res.send('OK');
-}); 
-
-app.use(express.static('app/html'));
-
-app.use(bodyParser.json());
-app.use(bodyParser.json({ type: 'application/vnd.api+json' })) 
+var bodyParser = require('body-parser');   
 
 var cache = {};
 var cacheTime = {};
@@ -53,31 +42,79 @@ function getFile(filename,callback){
 			} 
 		} 
 	}); 
-}
+}  
 
-app.get('/service/*', function(req, res){
-	var paths = req.params[0].split('/'), len = paths.length; 
-	var module = paths.slice(0,len-1).join('/');
-	var method = paths[len-1]; 
-	var filename = 'app/service/'+module+'.js'  
-	
-	getFile(filename,function(err, data) { //'utf8', 
-		var html = filename +' is not existing' ;
-		if (!err) try{
-			html = eval(data); 
-			if (method) html = eval(method); 
-			if (typeof html == 'function'){
-				html = html(req.query,req,res);
-			}
-		}catch(e){
-			html = e+'';
-		} 
-		res.send(html);
+function format(format) {
+	var args = Array.prototype.slice.call(arguments, 1);
+	return format.replace(/{(\d+)}/g, function(match, number) { 
+	  return typeof args[number] != 'undefined'
+		? args[number] 
+		: match
+	  ;
 	});
-});
+};
 
-function start(port){
-	port = port||8000;
-	app.listen(port); 
+function start(port,options){ 
+	var S = { 
+		html:'html',
+		service:'service' 
+	}
+	if (options) for (var k in options){
+		S[k] = options[k];
+	} 
+	
+	//create samples if folders don't exist!
+	fs.exists(S.html, function(exists){
+		if (exists) return;
+		var df = S.html+'/index.html'
+		var html = format("<h1>This is the sample page at {0} </h1>\n"
+		+"A sample service is <a href='service/test/hello?name=Alex'>here</a> ",df); 
+		fs.mkdirSync(S.html);
+		fs.writeFile(df,html,function(){}); 
+		console.log(df+ ' created');
+	});
+	fs.exists(S.service, function(exists){
+		if (exists) return; 
+		var df = S.service+'/test.js'
+		var code =  "function hello(q){\n"
+				 +  "	return {name:q.name,msg:'hello'} ;\n"
+				 +  "}";  
+		fs.mkdirSync(S.service);
+		fs.writeFile(df,code,function(){}); 
+		console.log(df + ' created');
+	});
+	
+	var app = express();  
+	
+	app.use(express.static(S.html));
+	
+	app.get('/service/*', function(req, res){
+		var paths = req.params[0].split('/'), len = paths.length; 
+		var module = paths.slice(0,len-1).join('/');
+		var method = paths[len-1]; 
+		var filename = S.service+'/'+module+'.js'  
+		
+		getFile(filename,function(err, data) { //'utf8', 
+			var html = filename +' is not existing' ;
+			if (!err) try{
+				html = eval(data); 
+				if (method) html = eval(method); 
+				if (typeof html == 'function'){
+					html = html(req.query,req,res);
+				}
+			}catch(e){
+				html = e+'';
+			} 
+			res.send(html);
+		});
+	});  
+	
+	app.use(bodyParser.json());
+	app.use(bodyParser.json({ type: 'application/vnd.api+json' }))  
+	
+	port = port||8000
+	app.listen(port);  
+	console.log('server started at http://localhost:'+port);
 } 
 
+module.exports = start;

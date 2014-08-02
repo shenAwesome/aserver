@@ -1,10 +1,13 @@
 {  
-	"name": "AServer",
+	"name": "aserver",
 	"description": "a server",   
 	"author": "Shen Z <shenAwesome@gmail.com>",
 	"version": "0.0.1",
-	"main": "index.js",  
-
+	"main": "index.js",   
+	"repositories": [ {
+		  "type": "git",
+		  "url": "https://github.com/shenAwesome/aserver"
+	}], 
 	"dependencies": {
 		"express": "*",
 		"mongoose":"*",
