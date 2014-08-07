@@ -107,8 +107,8 @@ function start(port,options){
 			} 
 			res.send(html);
 		});
-	});  
-	
+	}); 
+
 	app.use(bodyParser.json());
 	app.use(bodyParser.json({ type: 'application/vnd.api+json' }))  
 	

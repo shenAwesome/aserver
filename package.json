@@ -9,9 +9,8 @@
 		  "url": "https://github.com/shenAwesome/aserver"
 	}], 
 	"dependencies": {
-		"express": "*",
-		"mongoose":"*",
-		"body-parser":"*",
-		"memory-cache":"*"
+		"express": "*", 
+		"body-parser":"*" ,
+        "lodash": "*"
 	}
 }
